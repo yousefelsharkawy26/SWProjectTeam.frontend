@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Search, User, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,12 +17,11 @@ import Notification from "../ui/notification";
 import UserProvider from "../../context/UserContext";
 
 interface userSchema {
-  firstname: string,
-  lastname: string,
-  email: string,
-  bio: string,
-  permission: string,
-  imageUrl: string
+  name: string;
+  email: string;
+  bio: string;
+  permission: string;
+  imageUrl: string;
 }
 
 const TopNavbar = () => {
@@ -37,7 +35,7 @@ const TopNavbar = () => {
 
   useEffect(() => {
     setUser(context.user);
-  }, [context])
+  }, [context]);
 
   // Fetch users by name
   useEffect(() => {
@@ -48,26 +46,28 @@ const TopNavbar = () => {
       }
 
       try {
-        const response = await axios.get(`${apiUrl}/api/users/search?name=${search}`, {
-          headers: {
-            Authorization: `Bearer ${context.token}`,
-          },
-        });
+        const response = await axios.get(
+          `${apiUrl}/api/users/search?name=${search}`,
+          {
+            headers: {
+              Authorization: `Bearer ${context.token}`,
+            },
+          }
+        );
         console.log("search result: ", response.data);
-        
+
         setSearchResults(response.data);
-        
       } catch (error) {
         console.error("Error fetching search results:", error);
       }
-    }
-    
+    };
+
     fetchSearchResults();
   }, [search, context, apiUrl]);
 
   const handleCancelSearch = () => {
-    setSearch('')
-  }
+    setSearch("");
+  };
 
   const handleLogout = () => {
     // Here you would typically clear authentication tokens or session data
@@ -90,44 +90,71 @@ const TopNavbar = () => {
             onChange={(e) => setSearch(e.target.value)}
             value={search}
           />
-          <X 
-            onClick={handleCancelSearch} 
+          <X
+            onClick={handleCancelSearch}
             className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer"
-            visibility={(search.length > 0? "visable": "hidden")}
+            visibility={search.length > 0 ? "visable" : "hidden"}
           />
           {search && searchResults.length > 0 && (
             <div className="absolute z-10 bg-white border border-gray-200 rounded-md shadow-lg mt-1 w-full max-h-60 overflow-auto">
-              { searchResults?.map((result, i) => (
-                <Link to={`/profile/${result.name}`} key={i} className="block px-4 py-2 hover:bg-gray-100">
-                <div key={i} className="flex items-center p-2 hover:bg-gray-100">
-                  <Avatar className="h-8 w-8 mr-2">
-                    <AvatarImage src={ (result.imageUrl != undefined) ? apiUrl + "/images/" + result.imageUrl : apiUrl + "/images/" + "Avatar.png"} />
-                    <AvatarFallback>SC</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium capitalize">{result.name}</span>
-                    <span className="text-xs text-gray-500 uppercase">{result.permission}</span>
-                </div>
-                </div>
+              {searchResults?.map((result, i) => (
+                <Link
+                  to={`/profile/${result.name}`}
+                  key={i}
+                  className="block px-4 py-2 hover:bg-gray-100"
+                >
+                  <div
+                    key={i}
+                    className="flex items-center p-2 hover:bg-gray-100"
+                  >
+                    <Avatar className="h-8 w-8 mr-2">
+                      <AvatarImage
+                        src={
+                          result.imageUrl != undefined
+                            ? apiUrl + "/images/" + result.imageUrl
+                            : apiUrl + "/images/" + "Avatar.png"
+                        }
+                      />
+                      <AvatarFallback>SC</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium capitalize">
+                        {result.name}
+                      </span>
+                      <span className="text-xs text-gray-500 uppercase">
+                        {result.permission}
+                      </span>
+                    </div>
+                  </div>
                 </Link>
               ))}
             </div>
           )}
         </div>
       </div>
-      
+
       <div className="flex items-center gap-4">
-      
         <Notification />
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-2 focus:outline-none">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.imageUrl ? (apiUrl + "/images/" + user.imageUrl) : "placeholder.svg"} />
+              <AvatarImage
+                src={
+                  user?.imageUrl
+                    ? apiUrl + "/images/" + user.imageUrl
+                    : "placeholder.svg"
+                }
+              />
               <AvatarFallback>SC</AvatarFallback>
             </Avatar>
             <div className="flex flex-col text-left hidden md:block">
-              <span className="text-sm font-medium capitalize">Dr. {user?.firstname + ' ' + user?.lastname}</span>
-              <span className="text-xs text-gray-500 uppercase"> / {user?.permission}</span>
+              <span className="text-sm font-medium capitalize">
+                Dr. {user?.name}
+              </span>
+              <span className="text-xs text-gray-500 uppercase">
+                {" "}
+                / {user?.permission}
+              </span>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
@@ -143,7 +170,9 @@ const TopNavbar = () => {
               <Link to="/settings">Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-500" onClick={handleLogout}>Logout</DropdownMenuItem>
+            <DropdownMenuItem className="text-red-500" onClick={handleLogout}>
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -152,7 +152,7 @@ const NewAppointmentDialog = ({
         patientContext.setChanged(!open);
         patientContext.setAppointChanged(!open);
       })
-      .catch((err) => console.log(err.message));
+      .catch((err) => console.log(err));
   };
 
   const handleStartTimeChange = (value: string) => {

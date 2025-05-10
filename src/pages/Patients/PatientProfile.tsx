@@ -60,6 +60,7 @@ const PatientProfile = () => {
               patient={patient}
               appointments={appointments}
               medications={medications}
+              medicalRecords={medicalRecords}
             />
           </TabsContent>
 

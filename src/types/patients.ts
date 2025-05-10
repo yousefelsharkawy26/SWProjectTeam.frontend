@@ -59,9 +59,8 @@ export interface MedicalRecord {
   id: string;
   patientId: string;
   title: string;
-  type: 'test' | 'scan' | 'examination' | string;
+  type: any;
   description: string;
-  fileName: string;
   doctor: string;
   createdAt: string;
 }

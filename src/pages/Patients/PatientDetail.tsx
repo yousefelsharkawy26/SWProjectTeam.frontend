@@ -4,7 +4,12 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Calendar, Check, Pill, FileImage } from "lucide-react";
-import { User, Appointment, MedicationItem } from "@/types/patients";
+import {
+  User,
+  Appointment,
+  MedicationItem,
+  MedicalRecord,
+} from "@/types/patients";
 import { AddPrescriptionDialog } from "./AddPrescriptionDialog";
 import { AddDiagnosisDialog } from "./AddDiagnosisDialog";
 
@@ -12,12 +17,14 @@ interface PatientDetailProps {
   patient: User;
   appointments: Appointment[];
   medications: MedicationItem[];
+  medicalRecords: MedicalRecord[];
 }
 
 export function PatientDetail({
   patient,
   appointments,
   medications,
+  medicalRecords,
 }: PatientDetailProps) {
   const [prescriptionDialogOpen, setPrescriptionDialogOpen] = useState(false);
   const [diagnosisDialogOpen, setDiagnosisDialogOpen] = useState(false);
@@ -79,9 +86,11 @@ export function PatientDetail({
                       )}
                     </div>
                     <div>
-                      <h3 className="font-medium">{appointment.title}</h3>
+                      <h3 className="font-medium capitalize">
+                        {appointment.title}
+                      </h3>
                       <p className="text-sm text-gray-500">
-                        {appointment.doctor}
+                        Dr. {appointment.doctor}
                       </p>
                     </div>
                   </div>
@@ -90,6 +99,33 @@ export function PatientDetail({
                   </Button>
                 </div>
                 {index < appointments.length - 1 && <Separator />}
+              </div>
+            ))}
+            {medicalRecords?.map((record, index) => (
+              <div key={record.id}>
+                <div className="flex items-center justify-between py-4">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-orange-400 rounded-full p-3">
+                      {record?.type?.scanType ? (
+                        <Check className="h-5 w-5 text-white" />
+                      ) : (
+                        <FileImage className="h-5 w-5 text-white" />
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-medium capitalize">
+                        {record?.title}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Dr. {record?.doctor}
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="icon">
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </div>
+                {index < medicalRecords.length - 1 && <Separator />}
               </div>
             ))}
           </CardContent>

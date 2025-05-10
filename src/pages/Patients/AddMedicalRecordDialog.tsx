@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { MedicalRecord } from "@/types/patients";
+import DentistProvider from "@/context/DentistContext";
+import axios from "axios";
+import UserProvider from "@/context/UserContext";
 
 interface AddMedicalRecordDialogProps {
   patientId: string;
@@ -32,14 +35,17 @@ export const AddMedicalRecordDialog = forwardRef<
   HTMLButtonElement,
   AddMedicalRecordDialogProps
 >(({ patientId, onAddRecord }, ref) => {
+  const apiUrl: string = import.meta.env.VITE_API_URL;
+  const { token } = UserProvider.useUser();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [type, setType] = useState("test");
   const [description, setDescription] = useState("");
-  const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState(null);
   const [doctor, setDoctor] = useState("");
+  const { dentists } = DentistProvider.useDentist();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title || !type || !description || !doctor) {
@@ -47,32 +53,44 @@ export const AddMedicalRecordDialog = forwardRef<
       return;
     }
 
-    const newRecord: MedicalRecord = {
-      id: `REC${Math.floor(Math.random() * 10000000)}`,
-      patientId,
-      title,
-      type,
-      description,
-      fileName: fileName || "No file uploaded",
-      doctor,
-      createdAt: new Date().toISOString(),
-    };
+    const data = new FormData();
+    data.append('patientId', patientId);
+    data.append('title', title);
+    data.append('type', type);
+    data.append('description', description);
+    data.append('file', file);
+    data.append('doctor', doctor);
 
-    onAddRecord(newRecord);
-    toast.success("Medical record added successfully");
-    setOpen(false);
+    await axios
+      .post(`${apiUrl}/api/patients/add-medical-examination`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data"
+        },
+      })
+      .then(() => {
+        toast.success(`${title} added successfully.`);
+        setOpen(false);
 
-    // Reset form
-    setTitle("");
-    setType("test");
-    setDescription("");
-    setFileName("");
-    setDoctor("");
+        // Reset form
+        setTitle("");
+        setType("test");
+        setDescription("");
+        setFile(null);
+        setDoctor("");
+      })
+      .catch((err) => {
+        toast.error(`Something is wrong.`);
+        console.error(err);
+      });
+
+    
   };
 
-  const handleLoadFile = (file) => {
-
-  }
+  const handleLoadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setFile(file);
+  };
 
   const getIcon = () => {
     switch (type) {
@@ -94,7 +112,6 @@ export const AddMedicalRecordDialog = forwardRef<
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
-        <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Add Medical Record</DialogTitle>
             <DialogDescription>
@@ -115,6 +132,23 @@ export const AddMedicalRecordDialog = forwardRef<
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="doctor" className="text-right">
+                Doctor*
+              </Label>
+              <Select value={doctor} onValueChange={setDoctor}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select dentist" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dentists?.map((dentist, i) => (
+                    <SelectItem key={i} value={`${dentist?.id}`}>
+                      {dentist?.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="type" className="text-right">
                 Type*
               </Label>
@@ -125,29 +159,16 @@ export const AddMedicalRecordDialog = forwardRef<
                 <SelectContent>
                   <SelectItem value="test">Test Results</SelectItem>
                   <SelectItem value="scan">Scan/Image</SelectItem>
-                  <SelectItem value="examination">
-                    Medical Examination
-                  </SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="doctor" className="text-right">
-                Doctor*
-              </Label>
-              <UploadButton handleChange={handleLoadFile}>{getIcon()} Upload</UploadButton>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="fileName" className="text-right">
                 File
               </Label>
-              <Input
-                id="fileName"
-                value={fileName}
-                onChange={(e) => setFileName(e.target.value)}
-                className="col-span-3"
-                placeholder="File name (upload not functional in demo)"
-              />
+              <UploadButton handleChange={handleLoadFile}>
+                {getIcon()} Upload
+              </UploadButton>
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
               <Label htmlFor="description" className="text-right pt-2">
@@ -171,12 +192,11 @@ export const AddMedicalRecordDialog = forwardRef<
             >
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="button" onClick={handleSubmit}>
               {getIcon()}
               Add Record
             </Button>
           </DialogFooter>
-        </form>
       </DialogContent>
     </Dialog>
   );

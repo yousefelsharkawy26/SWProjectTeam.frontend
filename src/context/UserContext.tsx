@@ -65,8 +65,7 @@ const UserProvider = ({ children }) => {
         }})
       .then(res => {
         setUser({
-            firstname: res.data.firstName,
-            lastname: res.data.lastName,
+            name: res.data.name,
             email: res.data.email,
             bio: res.data.bio,
             phone: res.data.phone,

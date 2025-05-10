@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { SearchIcon, Plus, Package, AlertCircle } from "lucide-react";
 import AddNewInventory from "./AddNewInventory";
 import Restock from "./Restock";
-import axios from "axios";
-import UserProvider from "@/context/UserContext";
-import { format, isSameMonth } from "date-fns";
+import { isSameMonth } from "date-fns";
 import InventoryProvider from "@/context/InventoryContext";
 import { IInventory } from "@/types/Inventory";
 import Stock from "./Stock";

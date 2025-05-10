@@ -35,9 +35,10 @@ import { Badge } from "@/components/ui/badge";
 import UserProvider from "@/context/UserContext";
 import ClinicProvider from "@/context/ClinicContext";
 import { useEffect, useState } from "react";
-import { Patient } from "../Patients/Patients";
+import { Patient } from "@/types/patients";
 import { parseISO, isToday } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import InventoryProvider from "@/context/InventoryContext";
 
 const revenueData = [
   { name: "Jan", revenue: 4000 },
@@ -57,55 +58,13 @@ const appointmentData = [
   { name: "Sat", scheduled: 12, completed: 10 },
 ];
 
-const todayAppointments = [
-  {
-    id: "1",
-    time: "09:00 AM",
-    patient: "Emily Johnson",
-    treatment: "Dental Cleaning",
-    dentist: "Dr. Smith",
-    status: "completed",
-  },
-  {
-    id: "2",
-    time: "10:30 AM",
-    patient: "Michael Davis",
-    treatment: "Root Canal",
-    dentist: "Dr. Wilson",
-    status: "completed",
-  },
-  {
-    id: "3",
-    time: "12:00 PM",
-    patient: "Jessica Brown",
-    treatment: "Consultation",
-    dentist: "Dr. Smith",
-    status: "in-progress",
-  },
-  {
-    id: "4",
-    time: "02:30 PM",
-    patient: "Robert Miller",
-    treatment: "Tooth Extraction",
-    dentist: "Dr. Wilson",
-    status: "upcoming",
-  },
-  {
-    id: "5",
-    time: "04:00 PM",
-    patient: "Sarah Wilson",
-    treatment: "Dental Filling",
-    dentist: "Dr. Smith",
-    status: "upcoming",
-  },
-];
-
 const Dashboard = () => {
   const navigate = useNavigate();
-  const user = UserProvider.useUser().user;
+  const { user } = UserProvider.useUser();
   const patientContext = ClinicProvider.useClinic();
   const [patients, setPatients] = useState<Patient[] | null>([]);
   const [appointments, setAppointments] = useState([]);
+  const { inventories, setChanged } = InventoryProvider.useInventory();
 
   const filteredAppointments = appointments?.filter((appointment) => {
     const isSameDayAsSelected = isToday(parseISO(appointment.date));
@@ -126,9 +85,7 @@ const Dashboard = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-gray-500">
-            Welcome back, {user?.firstname + " " + user?.lastname}
-          </p>
+          <p className="text-gray-500">Welcome back, {user?.name}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" className="flex items-center gap-1">
@@ -220,7 +177,13 @@ const Dashboard = () => {
                 Alert
               </Badge>
             </div>
-            <h3 className="text-2xl font-bold mt-4">4</h3>
+            <h3 className="text-2xl font-bold mt-4">
+              {inventories?.reduce((total, item) => {
+                const isLowStock = item?.totalQuantity < item?.minimumLevel;
+                if (isLowStock) total += 1;
+                return total;
+              }, 0)}
+            </h3>
             <p className="text-gray-500 text-sm">Low inventory items</p>
             <div className="flex items-center mt-2 text-xs text-dental-blue">
               <span className="underline cursor-pointer">View items</span>
@@ -410,47 +373,26 @@ const Dashboard = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  {
-                    name: "John Smith",
-                    date: "Today, 10:30 AM",
-                    status: "Completed",
-                    statusColor: "bg-green-100 text-green-800",
-                  },
-                  {
-                    name: "Maria Garcia",
-                    date: "Today, 9:00 AM",
-                    status: "Completed",
-                    statusColor: "bg-green-100 text-green-800",
-                  },
-                  {
-                    name: "Robert Johnson",
-                    date: "Yesterday, 2:15 PM",
-                    status: "No-show",
-                    statusColor: "bg-red-100 text-red-800",
-                  },
-                  {
-                    name: "Patricia Williams",
-                    date: "Jun 5, 11:30 AM",
-                    status: "Completed",
-                    statusColor: "bg-green-100 text-green-800",
-                  },
-                  {
-                    name: "James Brown",
-                    date: "Jun 3, 3:45 PM",
-                    status: "Cancelled",
-                    statusColor: "bg-amber-100 text-amber-800",
-                  },
-                ].map((patient, i) => (
+                {patients.map((patient, i) => (
                   <TableRow key={i}>
                     <TableCell className="font-medium">
-                      {patient.name}
+                      {patient.firstName + " " + patient.lastName}
                     </TableCell>
                     <TableCell className="text-sm text-gray-600">
-                      {patient.date}
+                      {patient.lastVisit}
                     </TableCell>
                     <TableCell>
-                      <Badge className={patient.statusColor}>
+                      <Badge
+                        className={
+                          !patient.lastVisit
+                            ? "bg-red-100 text-red-800"
+                            : patient.status === "in_progress"
+                            ? "bg-green-100 text-blue-800"
+                            : patient.status === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-amber-100 text-amber-800"
+                        }
+                      >
                         {patient.status}
                       </Badge>
                     </TableCell>
