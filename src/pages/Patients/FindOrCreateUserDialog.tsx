@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ import {
 import axios from "axios";
 import UserProvider from "@/context/UserContext";
 import { toast } from "sonner";
-import { Patient } from "./Patients";
+import { Patient } from "@/types/patients";
 
 interface AddPatientDialogProps {
   open: boolean;
@@ -65,6 +66,9 @@ const FindOrCreateUserDialog = ({ open, onOpenChange, addPatientDialog, setPatin
                     aria-description="Search for a patient by email or phone number"
                     className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
+          <DialogDescription>
+            Fome for find user email
+          </DialogDescription>
           <DialogTitle>Add New Patient</DialogTitle>
         </DialogHeader>
 

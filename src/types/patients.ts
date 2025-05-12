@@ -11,14 +11,14 @@ export interface Patient {
   state: string;
   zipCode: string;
   medicalHistory: string;
-  allergies: string;
+  allergies: string[];
   imageUrl: string;
   lastVisit: string;
   nextAppointment: string;
   status: string;
   startTime: string;
   endTime: string;
-  createAt: Date | undefined;
+  createdAt: Date | undefined;
 }
 
 export interface User {
@@ -37,9 +37,9 @@ export interface Appointment {
   id: string;
   patientId: string;
   title: string;
-  doctor: string;
+  dentistName: string;
   date: string;
-  type: 'check-up' | 'x-ray' | 'other';
+  type: any;
   notes?: string;
   completed: boolean;
 }

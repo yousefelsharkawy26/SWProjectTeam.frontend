@@ -61,16 +61,16 @@ const Sidebar = () => {
       icon: <Package size={22} />,
       path: "/inventory",
     },
-    {
-      name: "Billing",
-      icon: <CreditCard size={22} />,
-      path: "/billing",
-    },
-    {
-      name: "Reports",
-      icon: <ClipboardList size={22} />,
-      path: "/reports",
-    },
+    // {
+    //   name: "Billing",
+    //   icon: <CreditCard size={22} />,
+    //   path: "/billing",
+    // },
+    // {
+    //   name: "Reports",
+    //   icon: <ClipboardList size={22} />,
+    //   path: "/reports",
+    // },
     {
       name: "Settings",
       icon: <Settings size={22} />,

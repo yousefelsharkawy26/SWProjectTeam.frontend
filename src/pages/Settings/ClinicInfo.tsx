@@ -26,8 +26,7 @@ interface ClinicData {
 const ClinicInfo = () => {
   const btnRef = useRef<HTMLInputElement>(null);
   const apiUrl = import.meta.env.VITE_API_URL;
-  const context = UserProvider.useUser();
-  const token = context.token || localStorage.getItem("token");
+  const { token} = UserProvider.useUser();
   const [clinicData, setClinicData] = useState<ClinicData | null>(null);
 
   const form = useForm<ClinicData>({

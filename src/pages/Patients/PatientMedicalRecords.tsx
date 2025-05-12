@@ -56,9 +56,9 @@ export function PatientMedicalRecords({
                         {new Date(record.createdAt).toLocaleDateString()}
                       </p>
                       <p className="mt-2">{record.description}</p>
-                      {record.fileName && (
+                      {record.title && (
                         <p className="text-sm text-medical-blue mt-1">
-                          File: {record.fileName}
+                          File: {record.title}
                         </p>
                       )}
                     </div>

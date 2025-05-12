@@ -1,5 +1,4 @@
-
-export type UserRole = 'admin' | 'dentist' | 'staff' | 'patient';
+export type UserRole = "admin" | "dentist" | "staff" | "patient";
 
 export interface User {
   id: string;
@@ -46,7 +45,7 @@ export interface Appointment {
   date: string;
   startTime: string;
   endTime: string;
-  status: 'scheduled' | 'completed' | 'cancelled' | 'no-show';
+  status: "scheduled" | "completed" | "cancelled" | "no-show";
   treatmentType: string;
   notes?: string;
 }
@@ -61,7 +60,7 @@ export interface Treatment {
   startDate: string;
   endDate?: string;
   cost: number;
-  status: 'planned' | 'in-progress' | 'completed' | 'cancelled';
+  status: "planned" | "in-progress" | "completed" | "cancelled";
   notes?: string;
 }
 
@@ -70,7 +69,7 @@ export interface Invoice {
   patientId: string;
   date: string;
   dueDate: string;
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
   items: {
     treatmentId: string;
     description: string;

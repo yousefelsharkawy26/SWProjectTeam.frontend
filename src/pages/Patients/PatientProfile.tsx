@@ -9,6 +9,7 @@ import { ArrowLeft, FileText } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { usePatientData } from "@/hooks/usePatientData";
 import NotFound from "../NotFound";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const PatientProfile = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,9 +19,38 @@ const PatientProfile = () => {
     medications,
     medicalRecords,
     handleAddMedicalRecord,
+    loading,
   } = usePatientData(id);
   const [dialogTriggerRef, setDialogTriggerRef] =
     useState<HTMLButtonElement | null>(null);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Link to="/patients">
+                <Button variant="ghost" size="icon" className="mr-2">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Skeleton className="h-8 w-48" />
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <Skeleton className="h-40 w-full" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-64 w-full" />
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (!patient) {
     return <NotFound />;

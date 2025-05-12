@@ -25,17 +25,16 @@ import NewTreatmentPlanDialog from "./NewTreatmentPlanDialog";
 import axios from "axios";
 import UserProvider from "@/context/UserContext";
 import { ITreatment } from "@/types/Treatment";
+import ClinicProvider from "@/context/ClinicContext";
 
 const Treatments = () => {
-  const apiUrl: string = import.meta.env.VITE_API_URL;
-  const { token } = UserProvider.useUser();
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedTreatment, setSelectedTreatment] = useState<string | null>(
     null
   );
-  const [treatments, setTreatments] = useState<ITreatment[]>([]);
+  const { treatments, setTreatmentChanged } = ClinicProvider.useClinic();
   const [changed, setChanged] = useState(true);
 
   const filteredTreatments = treatments?.filter((treatment) => {
@@ -59,22 +58,11 @@ const Treatments = () => {
   };
 
   useEffect(() => {
-    const fetchTreatments = async () => {
-      await axios
-        .get(`${apiUrl}/api/clinic/get-plans`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          setTreatments(res.data);
-          setChanged(false);
-          console.log(res.data);
-        })
-        .catch((err) => console.error(err));
-    };
-    if (token && changed) fetchTreatments();
-  }, [apiUrl, token, changed, open]);
+    if (changed) {
+      setTreatmentChanged(true);
+      setChanged(false);
+    }
+  }, [changed]);
 
   return (
     <MainLayout>

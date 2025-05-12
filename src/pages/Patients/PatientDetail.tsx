@@ -12,6 +12,9 @@ import {
 } from "@/types/patients";
 import { AddPrescriptionDialog } from "./AddPrescriptionDialog";
 import { AddDiagnosisDialog } from "./AddDiagnosisDialog";
+import { MedicationDetailDialog } from "./MedicationDetailDialog";
+import { AppointmentDetailDialog } from "./AppointmentDetailDialog";
+import { MedicalRecordDetailDialog } from "./MedicalRecordDetailDialog";
 
 interface PatientDetailProps {
   patient: User;
@@ -28,6 +31,34 @@ export function PatientDetail({
 }: PatientDetailProps) {
   const [prescriptionDialogOpen, setPrescriptionDialogOpen] = useState(false);
   const [diagnosisDialogOpen, setDiagnosisDialogOpen] = useState(false);
+
+  // New state for detailed views
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
+  const [appointmentDetailOpen, setAppointmentDetailOpen] = useState(false);
+  const [selectedMedication, setSelectedMedication] =
+    useState<MedicationItem | null>(null);
+  const [medicationDetailOpen, setMedicationDetailOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(
+    null
+  );
+  const [recordDetailOpen, setRecordDetailOpen] = useState(false);
+
+  const handleAppointmentClick = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setAppointmentDetailOpen(true);
+  };
+
+  // Handle medication click
+  const handleMedicationClick = (medication: MedicationItem) => {
+    setSelectedMedication(medication);
+    setMedicationDetailOpen(true);
+  };
+
+  const handleMedicalRecordClick = (record: MedicalRecord) => {
+    setSelectedRecord(record);
+    setRecordDetailOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -87,14 +118,18 @@ export function PatientDetail({
                     </div>
                     <div>
                       <h3 className="font-medium capitalize">
-                        {appointment.title}
+                        {appointment.type}
                       </h3>
                       <p className="text-sm text-gray-500">
-                        Dr. {appointment.doctor}
+                        Dr. {appointment.dentistName}
                       </p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleAppointmentClick(appointment)}
+                  >
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </div>
@@ -121,7 +156,11 @@ export function PatientDetail({
                       </p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleMedicalRecordClick(record)}
+                  >
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </div>
@@ -150,7 +189,11 @@ export function PatientDetail({
                       </p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleMedicationClick(medication)}
+                  >
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </div>
@@ -182,6 +225,24 @@ export function PatientDetail({
           open={diagnosisDialogOpen}
           onOpenChange={setDiagnosisDialogOpen}
           patientId={patient.id}
+        />
+
+        <AppointmentDetailDialog
+          appointment={selectedAppointment}
+          open={appointmentDetailOpen}
+          onOpenChange={setAppointmentDetailOpen}
+        />
+
+        <MedicationDetailDialog
+          medication={selectedMedication}
+          open={medicationDetailOpen}
+          onOpenChange={setMedicationDetailOpen}
+        />
+
+        <MedicalRecordDetailDialog
+          record={selectedRecord}
+          open={recordDetailOpen}
+          onOpenChange={setRecordDetailOpen}
         />
       </div>
     </div>

@@ -1,31 +1,35 @@
-
 import { useForm } from "react-hook-form";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
@@ -38,10 +42,16 @@ import { Patient } from "@/types/patients";
 interface AddPatientDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: (open: boolean) => void;
   initialPatient: Patient | undefined;
 }
 
-const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDialogProps) => {
+const AddPatientDialog = ({
+  open,
+  onOpenChange,
+  onSave,
+  initialPatient,
+}: AddPatientDialogProps) => {
   const context = UserProvider.useUser();
   const token = context.token;
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -54,61 +64,65 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
       phone: initialPatient?.phone || "",
       dateOfBirth: initialPatient?.dateOfBirth || undefined,
       gender: initialPatient?.gender || "",
-      country: initialPatient?.country || "", 
+      country: initialPatient?.country || "",
       city: initialPatient?.city || "",
       state: initialPatient?.state || "",
       zipCode: initialPatient?.zipCode || "",
       medicalHistory: initialPatient?.medicalHistory || "",
       allergies: initialPatient?.allergies || "",
-    }
+    },
   });
-  
+
   const onSubmit = async (data: Patient) => {
-
-    await axios.post(`${apiUrl}/api/clinic/add-patient`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      }
-    }).then((response) => { 
-      if (response.status === 200) {
-        if (response.data.message === "Patient Added Successfully") {
-        toast({
-          title: "Success",
-          description: `Patient ${data.firstName} ${data.lastName} has been added successfully.`,
-          duration: 2000,
-        });
-      }
-      else if (response.data.message === "Patient Is allready exists") {
-        toast({
-          title: "Patient Already Exists",
-          description: `Patient ${data.firstName} ${data.lastName} already exists.`,
-          variant: "destructive",
-        });
-      }
-      onOpenChange(false);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to add patient.",
-          variant: "destructive",
-        });
-      }
-    }).catch((error) => {
-      console.error("Error adding patient:", error);
-    });
-
+    await axios
+      .post(`${apiUrl}/api/clinic/add-patient`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          if (response.data.message === "Patient Added Successfully") {
+            toast({
+              title: "Success",
+              description: `Patient ${data.firstName} ${data.lastName} has been added successfully.`,
+              duration: 2000,
+            });
+          } else if (response.data.message === "Patient Is allready exists") {
+            toast({
+              title: "Patient Already Exists",
+              description: `Patient ${data.firstName} ${data.lastName} already exists.`,
+              variant: "destructive",
+            });
+          }
+          onSave(true);
+          onOpenChange(false);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to add patient.",
+            variant: "destructive",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error adding patient:", error);
+      });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent aria-describedby="add-patient" 
-                      className="max-w-2xl max-h-[90vh] overflow-y-auto"
-                      aria-description="Add a new patient">
+      <DialogContent
+        aria-describedby="add-patient"
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        aria-description="Add a new patient"
+      >
         <DialogHeader>
+          <DialogDescription>Fome for add new patient</DialogDescription>
           <DialogTitle>Add New Patient</DialogTitle>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -119,13 +133,17 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                   <FormItem>
                     <FormLabel>First Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John" disabled={initialPatient.firstName!=null} {...field} />
+                      <Input
+                        placeholder="John"
+                        disabled={initialPatient.firstName != null}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="lastName"
@@ -133,7 +151,11 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                   <FormItem>
                     <FormLabel>Last Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Smith" disabled={initialPatient.lastName!=null} {...field} />
+                      <Input
+                        placeholder="Smith"
+                        disabled={initialPatient.lastName != null}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -149,13 +171,18 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="john.smith@example.com" disabled={initialPatient.email!=null} {...field} />
+                      <Input
+                        type="email"
+                        placeholder="john.smith@example.com"
+                        disabled={initialPatient.email != null}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="phone"
@@ -163,7 +190,11 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="(123) 456-7890" disabled={initialPatient.phone!=null} {...field} />
+                      <Input
+                        placeholder="(123) 456-7890"
+                        disabled={initialPatient.phone != null}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -182,7 +213,7 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            disabled={initialPatient.dateOfBirth!=undefined}
+                            disabled={initialPatient.dateOfBirth != undefined}
                             variant="outline"
                             className={cn(
                               "pl-3 text-left font-normal",
@@ -217,14 +248,18 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="gender"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Gender</FormLabel>
-                    <Select onValueChange={field.onChange} disabled={initialPatient.gender!=null} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      disabled={initialPatient.gender != null}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select gender" />
@@ -240,7 +275,7 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                 )}
               />
             </div>
-            
+
             <p className="font-bold text-muted-foreground">Address</p>
             <div className="grid grid-cols-4 gap-4">
               <FormField
@@ -250,7 +285,11 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                   <FormItem>
                     <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <Input placeholder="USA" disabled={initialPatient.country!=null} {...field} />
+                      <Input
+                        placeholder="USA"
+                        disabled={initialPatient.country != null}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -263,7 +302,11 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                   <FormItem>
                     <FormLabel>City</FormLabel>
                     <FormControl>
-                      <Input placeholder="New York" disabled={initialPatient.city!=null} {...field} />
+                      <Input
+                        placeholder="New York"
+                        disabled={initialPatient.city != null}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -277,7 +320,11 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                   <FormItem>
                     <FormLabel>State</FormLabel>
                     <FormControl>
-                      <Input placeholder="state" disabled={initialPatient.state!=null} {...field} />
+                      <Input
+                        placeholder="state"
+                        disabled={initialPatient.state != null}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -291,7 +338,11 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                   <FormItem>
                     <FormLabel>ZIP Code</FormLabel>
                     <FormControl>
-                      <Input placeholder="83749" disabled={initialPatient.zipCode!=null} {...field} />
+                      <Input
+                        placeholder="83749"
+                        disabled={initialPatient.zipCode != null}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -306,11 +357,11 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                 <FormItem>
                   <FormLabel>Medical History</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Relevant medical history information" 
+                    <Textarea
+                      placeholder="Relevant medical history information"
                       className="min-h-[80px]"
-                      disabled={initialPatient.medicalHistory!=null}
-                      {...field} 
+                      disabled={initialPatient.medicalHistory != null}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -325,10 +376,10 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
                 <FormItem>
                   <FormLabel>Allergies</FormLabel>
                   <FormControl>
-                    <Input 
-                      disabled={initialPatient.allergies!=null}
-                      placeholder="Separate allergies with commas (e.g., Penicillin, Latex)" 
-                      {...field} 
+                    <Input
+                      disabled={initialPatient.allergies != null}
+                      placeholder="Separate allergies with commas (e.g., Penicillin, Latex)"
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -337,7 +388,11 @@ const AddPatientDialog = ({ open, onOpenChange, initialPatient }: AddPatientDial
             />
 
             <DialogFooter className="pt-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Add Patient</Button>

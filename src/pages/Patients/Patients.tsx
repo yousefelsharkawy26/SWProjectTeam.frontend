@@ -28,72 +28,6 @@ import FindOrCreateUserDialog from "./FindOrCreateUserDialog";
 import ClinicProvider from "@/context/ClinicContext";
 import { Patient } from "@/types/patients";
 
-// const patients = [
-//   {
-//     id: "1",
-//     name: "Emily Johnson",
-//     email: "emily.j@example.com",
-//     phone: "(555) 123-4567",
-//     lastVisit: "Jun 1, 2024",
-//     nextAppointment: "Jun 15, 2024",
-//     status: "Active",
-//   },
-//   {
-//     id: "2",
-//     name: "Michael Davis",
-//     email: "michael.d@example.com",
-//     phone: "(555) 234-5678",
-//     lastVisit: "May 27, 2024",
-//     nextAppointment: "Jun 10, 2024",
-//     status: "Active",
-//   },
-//   {
-//     id: "3",
-//     name: "Jessica Brown",
-//     email: "jessica.b@example.com",
-//     phone: "(555) 345-6789",
-//     lastVisit: "May 15, 2024",
-//     nextAppointment: "Jun 20, 2024",
-//     status: "Active",
-//   },
-//   {
-//     id: "4",
-//     name: "Robert Miller",
-//     email: "robert.m@example.com",
-//     phone: "(555) 456-7890",
-//     lastVisit: "Apr 30, 2024",
-//     nextAppointment: null,
-//     status: "Inactive",
-//   },
-//   {
-//     id: "5",
-//     name: "Sarah Wilson",
-//     email: "sarah.w@example.com",
-//     phone: "(555) 567-8901",
-//     lastVisit: "May 22, 2024",
-//     nextAppointment: "Jun 5, 2024",
-//     status: "Active",
-//   },
-//   {
-//     id: "6",
-//     name: "David Thompson",
-//     email: "david.t@example.com",
-//     phone: "(555) 678-9012",
-//     lastVisit: "May 18, 2024",
-//     nextAppointment: "Jun 18, 2024",
-//     status: "Active",
-//   },
-//   {
-//     id: "7",
-//     name: "Jennifer Martinez",
-//     email: "jennifer.m@example.com",
-//     phone: "(555) 789-0123",
-//     lastVisit: "May 10, 2024",
-//     nextAppointment: "Jun 8, 2024",
-//     status: "Active",
-//   },
-// ];
-
 const Patients = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const context = UserProvider.useUser();
@@ -103,6 +37,7 @@ const Patients = () => {
   const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
   const [openFindUserDialog, setOpenFindUserDialog] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [patient, setPatient] = useState<Patient | null>(null);
   const [patients, setpatients] = useState<Patient[] | null>([]);
 
@@ -122,7 +57,9 @@ const Patients = () => {
 
   useEffect(() => {
     setpatients(patinetContext.patients);
-    patinetContext.setChanged(!openAddDialog);
+    if (saved)
+      patinetContext.setChanged(true);
+    
   }, [patinetContext, openAddDialog]);
 
   return (
@@ -150,6 +87,7 @@ const Patients = () => {
           open={openAddDialog}
           onOpenChange={setOpenAddDialog}
           initialPatient={patient}
+          onSave={setSaved}
         />
       </div>
 
